@@ -34,10 +34,12 @@ all_tests: $(TEST_OBJ)   # Run all tests
 	@echo "| Running all Tests |"
 	@echo "+-------------------+"
 	@echo " "
-	@for test in $(TEST_TARGET) ; do \
-		make --no-print-directory $$test; \
+	@result=0; \
+	for test in $(TEST_TARGET); do \
+		make --no-print-directory $$test || result=1; \
 		echo " "; \
-	done
+	done; \
+	exit $$result
 
 .PHONY: list_tests
 list_tests:
@@ -54,8 +56,13 @@ BASH_COLOR_GREEN = \033[32m
 .PHONY: $(TEST_TARGET)   # Run a specific test
 $(TEST_TARGET): %: $(BUILD_DIR)/tests/%
 	@echo ">>> Running $<"
-	@./$< && echo -e "<<< $(BASH_COLOR_GREEN)OK$(BASH_COLOR_NONE)" \
-		|| echo -e "<<< $(BASH_COLOR_RED)FAILED$(BASH_COLOR_NONE)"
+	@test_exec=0; ./$< || test_exec=$$?; \
+	if [ $$test_exec -eq 0 ]; then \
+	    echo -e "<<< $(BASH_COLOR_GREEN)OK$(BASH_COLOR_NONE)"; \
+	else \
+	    echo -e "<<< $(BASH_COLOR_RED)FAILED$(BASH_COLOR_NONE)"; \
+	fi; \
+	exit $$test_exec
 
 
 $(EXERCISE_OBJ): $(BUILD_DIR)/%.o: %.c

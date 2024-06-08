@@ -1,15 +1,17 @@
 #ifndef SRTN_H
 #define SRTN_H
-#include "queue.h"
-#include "process.h"
 #include <stdlib.h>
 
+#include "process.h"
+#include "queue.h"
+
 /**
- * determine which is the current process to be processed. 
+ * determine which is the current process to be processed.
  * @param running_process the prevously running process
- * @result a pointer to the new running process (if something changed) or to the previously running process
+ * @result a pointer to the new running process (if something changed) or to the
+ * previously running process
  */
-process *SRTN_tick(process * running_process);
+process *SRTN_tick(process *running_process);
 
 /**
  * Do everything you have to at startup in this function. It is called once.
@@ -21,13 +23,14 @@ int SRTN_startup();
  * Handle new arrivals
  * @param arriving_process A pointer to a new arriving process
  * @param running_process A pointer to previously running process
- * @result A pointer to the new active (running) process (if that changed) or to the previously running process
+ * @result A pointer to the new active (running) process (if that changed) or to
+ * the previously running process
  */
-process *SRTN_new_arrival(process * arriving_process,
-			  process * running_process);
+process *SRTN_new_arrival(process *arriving_process, process *running_process);
 
 /**
- * is called once after the all processes were handled. In case you want to cleanup something
+ * is called once after the all processes were handled. In case you want to
+ * cleanup something
  */
 void SRTN_finish();
-#endif				//SRTN_H
+#endif  // SRTN_H

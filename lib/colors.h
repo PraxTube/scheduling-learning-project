@@ -5,4 +5,4 @@ void set_color(int index);
 
 void reset_color();
 
-#endif				//COLORS_H
+#endif  // COLORS_H

@@ -7,19 +7,19 @@
 
 #define PROCESS_COUNT   5
 #define RR_QUANTUM      2
-#define STRATEGY        MLF
+#define STRATEGY        RR
 
 int main()
 {
     /*Defining the processes                Arrival Dur.    Prio    ID
                                             uint    uint    uint    char*/
-    process processes[PROCESS_COUNT] = {{   0,      3,      1,      'A'},
-                                        {   1,      2,      4,      'B'},
-                                        {   2,      2,      2,      'C'}};
-         
-    const char *expected_result = "ABCBCAA";
-    
-    print_schedule_info(PROCESS_COUNT, STRATEGY, 0, processes);
+    process processes[PROCESS_COUNT] = {{   1,      3,      2,      'A'},
+                                        {   2,      6,      4,      'B'},
+                                        {   4,      4,      1,      'C'},
+                                        {   6,      5,      5,      'D'},
+                                        {   8,      2,      3,      'E'}};
+    const char *expected_result = " AABBACCBBDDEECCBBDDD";
+    print_schedule_info(PROCESS_COUNT, STRATEGY, RR_QUANTUM, processes);
 
     char* resulting_schedule = scheduler(processes,PROCESS_COUNT,STRATEGY,RR_QUANTUM);
 

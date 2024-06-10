@@ -18,10 +18,12 @@ process *LCFS_tick(process *running_process) {
         }
 
         running_process = LCFS_queue->next->object;
-        if (LCFS_queue->next->next == NULL) {
+        queue_object *next = LCFS_queue->next->next;
+        free(LCFS_queue->next);
+        if (next == NULL) {
             LCFS_queue->next = NULL;
         } else {
-            LCFS_queue->next = LCFS_queue->next->next;
+            LCFS_queue->next = next;
         }
     }
     if (running_process != NULL) {

@@ -11,11 +11,7 @@ int queue_add(void *new_object, queue_object *queue) {
         return 1;
     }
 
-    if (queue->next != NULL) {
-        queue_object *tmp_ptr = queue->next;
-        ptr->next = tmp_ptr;
-    }
-
+    ptr->next = queue->next;
     queue->next = ptr;
     ptr->object = new_object;
 
@@ -72,4 +68,5 @@ void *queue_peek(queue_object *queue) {
         }
         current_ptr = current_ptr->next;
     }
+    return current_ptr;
 }

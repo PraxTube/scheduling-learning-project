@@ -9,7 +9,7 @@ static unsigned int elapsed;
 // This assumes that the duration (initial `time_left`)
 // is stored inside proc->priority.
 // This isn't super clean, but we don't use priority for anything else here.
-float priority(process *proc) {
+static float priority(process *proc) {
     if (proc == NULL) {
         return 0;
     }
@@ -23,7 +23,7 @@ float priority(process *proc) {
 
 // Put the process with the biggest response ratio at the end of the queue. It
 // doesn't actually sort the queue and has O(n) as a result.
-void semi_sort_queue() {
+static void semi_sort_queue() {
     queue_object *previous_ptr = HRRN_queue;
     queue_object *current_ptr = HRRN_queue->next;
 
@@ -48,7 +48,7 @@ void semi_sort_queue() {
 }
 
 // Get the next process that should be run.
-process *determine_next_process() {
+static process *determine_next_process() {
     // Queue is empty
     if (HRRN_queue->next == NULL) {
         return NULL;

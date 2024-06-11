@@ -1,4 +1,5 @@
 #include "../lib/RR.h"
+
 #include <stdio.h>
 
 static queue_object *RR_queue;
@@ -43,11 +44,13 @@ int RR_startup(int quantum) {
 process *RR_new_arrival(process *arriving_process, process *running_process) {
     if (arriving_process != NULL) {
         arriving_process->priority = 0;
-        queue_add(arriving_process, RR_queue);
+        if (running_process == NULL) {
+            running_process = arriving_process;
+        } else {
+            queue_add(arriving_process, RR_queue);
+        }
     }
     return running_process;
 }
 
-void RR_finish() {
- free_queue(RR_queue);
-}
+void RR_finish() { free_queue(RR_queue); }

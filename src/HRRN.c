@@ -53,10 +53,6 @@ static process *determine_next_process() {
     if (HRRN_queue->next == NULL) {
         return NULL;
     }
-    // Exactly one element in queue
-    if (HRRN_queue->next->next == NULL) {
-        return queue_poll(HRRN_queue);
-    }
 
     semi_sort_queue();
     return queue_poll(HRRN_queue);

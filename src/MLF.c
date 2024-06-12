@@ -1,5 +1,6 @@
 #include "../lib/MLF.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -12,6 +13,18 @@ typedef struct {
 const unsigned int LEVELS = 4;
 static queue_object **MLF_queues;
 static queue_object *process_info_queue;
+
+static unsigned int level_rounds(process_info *proc_info) {
+    if (proc_info->level < 3) {
+        return 1 << proc_info->level;
+    } else if (proc_info->level == 3) {
+        // Pratically infinity
+        return -1;
+    } else {
+        printf("Should never happen");
+        return 0;
+    }
+}
 
 static queue_object *next_lower_level(process_info *proc_info) {
     if (proc_info->level >= LEVELS) {
@@ -98,7 +111,7 @@ process *MLF_tick(process *running_process) {
     // print_process(running_process);
     process_info *proc_info = get_process_info(running_process);
     // Process ran out of time, put in next lower level
-    if (proc_info->elapsed >= (1 << proc_info->level)) {
+    if (proc_info->elapsed >= level_rounds(proc_info)) {
         proc_info->elapsed = 0;
         queue_add(running_process, next_lower_level(proc_info));
         running_process = determine_next_process();
@@ -147,7 +160,7 @@ process *MLF_new_arrival(process *arriving_process, process *running_process) {
 
     process_info *proc_info = get_process_info(running_process);
     // Replace running process
-    if (proc_info->elapsed == (1 << proc_info->level)) {
+    if (proc_info->elapsed == level_rounds(proc_info)) {
         proc_info->elapsed = 0;
         queue_add(running_process, next_lower_level(proc_info));
         queue_add(arriving_process, MLF_queues[0]);

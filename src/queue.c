@@ -5,6 +5,10 @@
 #include <stdlib.h>
 
 int queue_add(void *new_object, queue_object *queue) {
+    if (queue == NULL) {
+        return 1;
+    }
+
     queue_object *ptr = (queue_object *)malloc(sizeof(queue_object));
 
     if (ptr == NULL) {
@@ -19,6 +23,9 @@ int queue_add(void *new_object, queue_object *queue) {
 }
 
 void *queue_poll(queue_object *queue) {
+    if (queue == NULL) {
+        return NULL;
+    }
     if (queue->next == NULL) {
         return NULL;
     }
@@ -60,6 +67,9 @@ void free_queue(queue_object *queue) {
 }
 
 void *queue_peek(queue_object *queue) {
+    if (queue == NULL) {
+        return NULL;
+    }
     queue_object *current_ptr = queue;
 
     while (1) {

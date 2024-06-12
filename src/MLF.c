@@ -83,32 +83,33 @@ static process_info *get_process_info(process *proc) {
 
 void print_process(process *proc) {
     process_info *proc_info = get_process_info(proc);
-    printf("\nid: %c, time_left: %d, elapsed: %d, level: %d\n", proc->id, proc->time_left, proc_info->elapsed, proc_info->level);
+    printf("\nid: %c, time_left: %d, elapsed: %d, level: %d\n", proc->id,
+           proc->time_left, proc_info->elapsed, proc_info->level);
 }
 
 process *MLF_tick(process *running_process) {
     if (running_process == NULL || running_process->time_left == 0) {
         running_process = determine_next_process();
     }
-    if (running_process != NULL) {
-        // print_process(running_process);
-        process_info *proc_info = get_process_info(running_process);
-        // Process ran out of time, put in next lower level
-        if (proc_info->elapsed >= (1 << proc_info->level)) {
-            proc_info->elapsed = 0;
-            queue_add(running_process, next_lower_level(proc_info));
-            running_process = determine_next_process();
-            if (running_process != NULL) {
-                process_info *proc_info = get_process_info(running_process);
-                running_process->time_left--;
-                proc_info->elapsed++;
-                // print_process(running_process);
-            }
-        } else {
+    if (running_process == NULL) {
+        return running_process;
+    }
+
+    // print_process(running_process);
+    process_info *proc_info = get_process_info(running_process);
+    // Process ran out of time, put in next lower level
+    if (proc_info->elapsed >= (1 << proc_info->level)) {
+        proc_info->elapsed = 0;
+        queue_add(running_process, next_lower_level(proc_info));
+        running_process = determine_next_process();
+        if (running_process != NULL) {
+            process_info *proc_info = get_process_info(running_process);
             running_process->time_left--;
             proc_info->elapsed++;
-            // print_process(running_process);
         }
+    } else {
+        running_process->time_left--;
+        proc_info->elapsed++;
     }
     return running_process;
 }
@@ -129,29 +130,31 @@ int MLF_startup() {
 }
 
 process *MLF_new_arrival(process *arriving_process, process *running_process) {
-    if (arriving_process != NULL) {
-        process_info *new_process_info = (process_info *)malloc(sizeof(process_info));
-        new_process_info->id = arriving_process->id;
-        new_process_info->elapsed = 0;
-        new_process_info->level = 0;
-        queue_add(new_process_info, process_info_queue);
+    if (arriving_process == NULL) {
+        return running_process;
+    }
 
-        if (running_process == NULL) {
-            running_process = arriving_process;
-        } else if (arriving_process->priority > running_process->priority) {
-            // Replace running process
-            process_info *proc_info = get_process_info(running_process);
-            if (proc_info->elapsed >= (1 << proc_info->level)) {
-                proc_info->elapsed = 0;
-                queue_add(running_process, next_lower_level(proc_info));
-            } else {
-                queue_add(running_process, MLF_queues[proc_info->level]);
-            }
-            running_process = arriving_process;
-        } else {
-            // Add to first level queue
-            queue_add(arriving_process, MLF_queues[0]);
-        }
+    process_info *new_process_info =
+        (process_info *)malloc(sizeof(process_info));
+    new_process_info->id = arriving_process->id;
+    new_process_info->elapsed = 0;
+    new_process_info->level = 0;
+    queue_add(new_process_info, process_info_queue);
+
+    if (running_process == NULL) {
+        return arriving_process;
+    }
+
+    process_info *proc_info = get_process_info(running_process);
+    // Replace running process
+    if (proc_info->elapsed == (1 << proc_info->level)) {
+        proc_info->elapsed = 0;
+        queue_add(running_process, next_lower_level(proc_info));
+        queue_add(arriving_process, MLF_queues[0]);
+        running_process = determine_next_process();
+    } else {
+        // Add to first level queue
+        queue_add(arriving_process, MLF_queues[0]);
     }
     return running_process;
 }

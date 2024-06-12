@@ -5,7 +5,7 @@
 #include<stdlib.h>
 #include<stdio.h>
 
-#define PROCESS_COUNT   5
+#define PROCESS_COUNT   3
 #define RR_QUANTUM      2
 #define STRATEGY        MLF
 
@@ -16,9 +16,7 @@ int main()
     process processes[PROCESS_COUNT] = {{   0,      3,      1,      'A'},
                                         {   1,      2,      4,      'B'},
                                         {   2,      2,      2,      'C'}};
-         
     const char *expected_result = "ABCBCAA";
-    
     print_schedule_info(PROCESS_COUNT, STRATEGY, 0, processes);
 
     char* resulting_schedule = scheduler(processes,PROCESS_COUNT,STRATEGY,RR_QUANTUM);

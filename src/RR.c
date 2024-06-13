@@ -28,7 +28,6 @@ process *RR_tick(process *running_process) {
         running_process->time_left--;
         running_process->priority++;
     }
-
     return running_process;
 }
 
@@ -43,6 +42,7 @@ int RR_startup(int quantum) {
 
 process *RR_new_arrival(process *arriving_process, process *running_process) {
     if (arriving_process != NULL) {
+        // We use priority to keep track of the elapsed time of each process.
         arriving_process->priority = 0;
         if (running_process == NULL) {
             running_process = arriving_process;

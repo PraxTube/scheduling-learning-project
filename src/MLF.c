@@ -1,6 +1,5 @@
 #include "../lib/MLF.h"
 
-#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -18,18 +17,24 @@ static unsigned int level_rounds(process_info *proc_info) {
     if (proc_info->level < 3) {
         return 1 << proc_info->level;
     } else if (proc_info->level == 3) {
-        // Pratically infinity
+        // Pratically infinity, let the process run until it finishes
         return -1;
     } else {
-        printf("Should never happen");
-        return 0;
+        fprintf(stderr,
+                "Critical error: invalid level %u in proc_info. Terminating "
+                "program.\n",
+                proc_info->level);
+        exit(EXIT_FAILURE);
     }
 }
 
 static queue_object *next_lower_level(process_info *proc_info) {
     if (proc_info->level >= LEVELS) {
-        printf("Should never happen, level: %d\n", proc_info->level);
-        return NULL;
+        fprintf(stderr,
+                "Critical error: invalid level %u in proc_info. Terminating "
+                "program.\n",
+                proc_info->level);
+        exit(EXIT_FAILURE);
     }
 
     if (proc_info->level < LEVELS - 1) {
@@ -78,6 +83,7 @@ static process *determine_next_process() {
     return NULL;
 }
 
+// Takes O(n), prefer to cache the result
 static process_info *get_process_info(process *proc) {
     if (process_info_queue == NULL) {
         return NULL;
@@ -94,12 +100,6 @@ static process_info *get_process_info(process *proc) {
     return NULL;
 }
 
-void print_process(process *proc) {
-    process_info *proc_info = get_process_info(proc);
-    printf("\nid: %c, time_left: %d, elapsed: %d, level: %d\n", proc->id,
-           proc->time_left, proc_info->elapsed, proc_info->level);
-}
-
 process *MLF_tick(process *running_process) {
     if (running_process == NULL || running_process->time_left == 0) {
         running_process = determine_next_process();
@@ -108,7 +108,6 @@ process *MLF_tick(process *running_process) {
         return running_process;
     }
 
-    // print_process(running_process);
     process_info *proc_info = get_process_info(running_process);
     // Process ran out of time, put in next lower level
     if (proc_info->elapsed >= level_rounds(proc_info)) {
@@ -159,14 +158,13 @@ process *MLF_new_arrival(process *arriving_process, process *running_process) {
     }
 
     process_info *proc_info = get_process_info(running_process);
-    // Replace running process
+    // Currently running process finished, determine new process
     if (proc_info->elapsed == level_rounds(proc_info)) {
         proc_info->elapsed = 0;
         queue_add(running_process, next_lower_level(proc_info));
         queue_add(arriving_process, MLF_queues[0]);
         running_process = determine_next_process();
     } else {
-        // Add to first level queue
         queue_add(arriving_process, MLF_queues[0]);
     }
     return running_process;

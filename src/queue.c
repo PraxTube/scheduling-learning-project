@@ -1,6 +1,5 @@
 #include "../lib/queue.h"
 
-#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -23,10 +22,7 @@ int queue_add(void *new_object, queue_object *queue) {
 }
 
 void *queue_poll(queue_object *queue) {
-    if (queue == NULL) {
-        return NULL;
-    }
-    if (queue->next == NULL) {
+    if (queue == NULL || queue->next == NULL) {
         return NULL;
     }
 
@@ -58,7 +54,6 @@ void free_queue(queue_object *queue) {
     }
 
     queue_object *current_ptr = queue;
-
     while (current_ptr != NULL) {
         queue_object *previous_ptr = current_ptr;
         current_ptr = current_ptr->next;
@@ -67,16 +62,13 @@ void free_queue(queue_object *queue) {
 }
 
 void *queue_peek(queue_object *queue) {
-    if (queue == NULL) {
+    if (queue == NULL || queue->next == NULL) {
         return NULL;
     }
-    queue_object *current_ptr = queue;
 
-    while (1) {
-        if (current_ptr->next == NULL) {
-            return current_ptr->object;
-        }
+    queue_object *current_ptr = queue;
+    while (current_ptr->next != NULL) {
         current_ptr = current_ptr->next;
     }
-    return current_ptr;
+    return current_ptr->object;
 }

@@ -1,7 +1,6 @@
 #include "../lib/LCFS.h"
 
 static queue_object *LCFS_queue;
-// You can add more global variables here
 
 int LCFS_startup() {
     LCFS_queue = new_queue();
@@ -20,11 +19,7 @@ process *LCFS_tick(process *running_process) {
         running_process = LCFS_queue->next->object;
         queue_object *next = LCFS_queue->next->next;
         free(LCFS_queue->next);
-        if (next == NULL) {
-            LCFS_queue->next = NULL;
-        } else {
-            LCFS_queue->next = next;
-        }
+        LCFS_queue->next = next;
     }
     if (running_process != NULL) {
         running_process->time_left--;
